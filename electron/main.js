@@ -48,16 +48,7 @@ app.whenReady().then(() => {
 
     autoUpdater.on('update-available', (info) => {
         console.log('업데이트가 가능합니다.');
-        dialog.showMessageBox(mainWindow, {
-            type: 'info',
-            buttons: ['업데이트', '취소'],
-            title: '업데이트 알림',
-            message: '새로운 업데이트가 있습니다.'
-        }).then((result) => {
-            if (result.response === 0) {
-                autoUpdater.downloadUpdate();
-            }
-        });
+        autoUpdater.downloadUpdate();
     });
 
     autoUpdater.on('update-not-available', () => {
@@ -72,15 +63,15 @@ app.whenReady().then(() => {
         console.log('업데이트 다운로드 완료', info);
         dialog.showMessageBox(mainWindow, {
             type: 'info',
-            buttons: ['재시작', '나중에'],
-            title: '업데이트 다운로드 완료',
-            message: '업데이트가 다운로드 되었습니다. 지금 설치하시겠습니까?'
+            buttons: ['업데이트 및 재시작', '나중에'],
+            title: '업데이트 알림',
+            message: '업데이트가 있습니다. 지금 설치하시겠습니까?'
         }).then((result) => {
             if (result.response === 0) {
                 autoUpdater.quitAndInstall();
             }
         })
-    })
+    });
 });
 
 app.on('window-all-closed', () => {
