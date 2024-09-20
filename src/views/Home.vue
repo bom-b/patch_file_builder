@@ -186,7 +186,7 @@ function makePatchFile() {
   <div style="display: block; height: 100%;">
 
     <div>
-      <h4 style="margin-bottom: 10px; color: rgba(246, 246, 246, 0.64);">경로 설정!!</h4>
+      <h4 style="margin-bottom: 10px; color: rgba(246, 246, 246, 0.64);">경로 설정</h4>
       <div class="form-wrapper">
         <label for="project-path" style="">작업 프로젝트 경로 : </label>
         <input id="project-path" v-model="projectPath" class="form-control2" style="margin-left: 20px; width: 600px;">
