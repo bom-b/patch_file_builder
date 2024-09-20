@@ -1,7 +1,8 @@
 // main.js
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, autoUpdater } = require('electron');
 const path  = require('path');
 const { fileURLToPath }  = require('url');
+
 const {registerIpcHandlers,sqlHandlers} = require('./ipcHandler');
 const { closeDatabase } = require('./database');
 

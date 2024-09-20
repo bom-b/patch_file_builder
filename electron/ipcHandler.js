@@ -7,6 +7,7 @@ const { utilExport } = require('./fileCopyUtilExport')
 // sql
 const { getAllSettings, getOneSettingById, updateSettings } = require('./sql/userInput');
 const { getUsersPreset, getAllPreset, insertPreset } = require('./sql/preset');
+const {autoUpdater} = require("electron-updater");
 
 function registerIpcHandlers(mainWindow) {
     // 최소화, 최대화, 종료 이벤트 처리
@@ -26,6 +27,26 @@ function registerIpcHandlers(mainWindow) {
         mainWindow.close();
     });
 
+    // 업데이트 관련
+    ipcMain.on('check-for-update', (event) => {
+        autoUpdater.checkForUpdates();
+    });
+
+    ipcMain.on('quit-and-install', (event) => {
+        autoUpdater.quitAndInstall();
+    })
+
+    autoUpdater.on('update-available', () => {
+        event.sender.send('update-available');
+    });
+
+    autoUpdater.on('update-not-available', () => {
+        event.sender.send('update-not-available');
+    });
+
+    autoUpdater.on('update-downloaded', () => {
+        event.sender.send('update-downloaded');
+    });
 
     // 파일 핸들링 관련
     ipcMain.handle('dialog:openFolder', async () => {

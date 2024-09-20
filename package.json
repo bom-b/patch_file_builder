@@ -24,9 +24,17 @@
     ],
     "directories": {
       "output": "dist_electron"
-    }
+    },
+    "publish" : [
+      {
+        "provider": "github",
+        "owner": "bom-b",
+        "repo": "patch_file_builder"
+      }
+    ]
   },
   "dependencies": {
+    "electron-updater": "^6.3.4",
     "sqlite3": "^5.1.7",
     "sweetalert2": "^11.14.0",
     "vue": "^3.4.29",
@@ -40,7 +48,7 @@
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.5",
     "cross-env": "^7.0.3",
-    "electron": "^32.1.0",
+    "electron": "^32.1.1",
     "electron-builder": "^25.0.5",
     "electron-reload": "^2.0.0-alpha.1",
     "vite": "^5.3.1"
