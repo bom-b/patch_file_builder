@@ -13,7 +13,7 @@ See [Vite Configuration Reference](https://vitejs.dev/config/).
 ## Project Setup
 
 ```sh
-npm install
+yarn install
 ```
 
 ### Compile and Hot-Reload for Development
