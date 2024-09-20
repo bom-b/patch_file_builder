@@ -3,12 +3,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('winAPI', {
     minimize: () => ipcRenderer.send('minimize-window'),
     maximize: () => ipcRenderer.send('maximize-window'),
-    close: () => ipcRenderer.send('close-window'),
-    checkForUpdate: () => ipcRenderer.send('check-for-update'),
-    quitAndInstall: () => ipcRenderer.send('quit-and-install'),
-    updateAvailable: () => ipcRenderer.send('update-available'),
-    updateNotAvailable: () => ipcRenderer.send('update-not-available'),
-    updateDownloaded: () => ipcRenderer.send('update-downloaded'),
+    close: () => ipcRenderer.send('close-window')
 });
 
 contextBridge.exposeInMainWorld('fileAPI', {
