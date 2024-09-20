@@ -12,6 +12,7 @@
   "build": {
     "appId": "patch_file_builder",
     "productName": "PatchFile_Builder",
+    "artifactName": "PatchFile_Builder-Setup-${version}.exe",
     "asar": false,
     "win": {
       "target": "nsis",
