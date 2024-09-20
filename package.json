@@ -1,0 +1,48 @@
+{
+  "name": "patchfile_builder",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development vite",
+    "build": "cross-env NODE_ENV=production vite build",
+    "preview": "vite preview",
+    "electron:serve": "cross-env NODE_ENV=development electron .",
+    "electron:build": "cross-env NODE_ENV=production electron-builder"
+  },
+  "build": {
+    "appId": "patch_file_builder",
+    "productName": "PatchFile_Builder",
+    "asar": false,
+    "win": {
+      "target": "nsis",
+      "icon": "icon.png",
+      "compression": "maximum"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ],
+    "directories": {
+      "output": "dist_electron"
+    }
+  },
+  "dependencies": {
+    "sqlite3": "^5.1.7",
+    "sweetalert2": "^11.14.0",
+    "vue": "^3.4.29",
+    "vue-router": "^4.4.5"
+  },
+  "main": "electron/main.js",
+  "keywords": [],
+  "author": "coding_choonsik",
+  "license": "ISC",
+  "description": "SQLGlue",
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.5",
+    "cross-env": "^7.0.3",
+    "electron": "^32.1.0",
+    "electron-builder": "^25.0.5",
+    "electron-reload": "^2.0.0-alpha.1",
+    "vite": "^5.3.1"
+  }
+}

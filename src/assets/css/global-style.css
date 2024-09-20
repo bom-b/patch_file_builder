@@ -1,0 +1,215 @@
+* {
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently
+                          supported by Chrome and Opera */
+    -webkit-user-drag: none;
+    font-size: 15px;
+}
+
+body {
+    background-color: #2b2d31;
+    color: white;
+    overflow: hidden;
+}
+
+#container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+input[type="radio"] {
+    accent-color: #ff7f27;
+}
+
+input[type="checkbox"] {
+    accent-color: #ff7f27;
+}
+
+/*시그니처 색상*/
+.redWine {
+    color: #8a2b3e;
+}
+
+.redWine-background {
+    background-color: #8a2b3e;
+}
+
+.gray {
+    color: gray;
+}
+
+/*시그니처 버튼*/
+.btn-signature {
+    background-color: #3f48cc;
+    color: white;
+    border: none;
+    border-radius: 0;
+    padding: 10px 20px;
+    min-width: 20px;
+    min-height: 10px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.btn-signature:hover {
+    background-color: #4a5de0;
+    color: white;
+}
+
+/*시그니처 버튼*/
+.btn-signature2 {
+    background-color: #ff7f27;
+    color: white;
+    border: none;
+    border-radius: 0;
+    padding: 2px 5px;
+    min-width: 40px;
+    min-height: 10px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.btn-signature2:hover {
+    background-color: #ffb17b;
+    color: white;
+}
+
+.btn-gray {
+    background-color: #e7e7e7;
+    color: #8a2b3e;
+    border: none;
+    border-radius: 0;
+    padding: 2px 5px;
+    min-width: 40px;
+    min-height: 10px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.btn-gray:hover {
+    background-color: #dedede;
+    color: #8a2b3e;
+}
+
+.btn-setting {
+    background-color: #393b40;
+    color: #fff;
+    border: 1px solid #4e5157;
+    border-radius: 1px;
+    min-width: 50px;
+    min-height: 30px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    font-size: 15px;
+}
+
+.btn-setting:hover {
+    background-color: #575a60;
+    color: #fff;
+}
+
+/*시그니처 인풋*/
+.form-control {
+    border: 1px solid rgba(255, 127, 39, 0) !important; /* 테두리 색상 변경 */
+    outline: none !important; /* 기본 아웃라인 제거 */
+    border-radius: 0 !important;
+    background-color: #1e1f22 !important;
+    color: white !important;
+}
+
+.form-control:focus {
+    /*box-shadow: 0 0 0 0.2rem rgba(255, 127, 39, 0.35) !important; !* #8a2b3e 색상의 네온사인 효과 *!*/
+    box-shadow: none !important;
+}
+
+.form-control2 {
+    border: 1px solid #4e5157 !important; /* 테두리 색상 변경 */
+    outline: none !important; /* 기본 아웃라인 제거 */
+    border-radius: 1px !important;
+    background-color: #2b2d31 !important;
+    color: rgba(246, 246, 246, 0.64) !important;
+    padding: 0 10px;
+    height: 30px;
+}
+
+.form-control2:focus {
+    box-shadow: 0 0 0 0.1rem rgba(255, 127, 39, 0.35) !important; /* #8a2b3e 색상의 네온사인 효과 */
+}
+
+.disabled-form-control2 {
+    border: 1px solid #4e5157 !important; /* 테두리 색상 변경 */
+    outline: none !important; /* 기본 아웃라인 제거 */
+    border-radius: 1px !important;
+    background-color: #2b2d31 !important;
+    color: rgba(246, 246, 246, 0.11) !important;
+    padding: 0 10px;
+    height: 30px;
+}
+
+/*링크 밑줄 제거*/
+.no-underline {
+    text-decoration: none;
+}
+
+a {
+    text-decoration: none;
+}
+
+p {
+    margin-bottom: 0 !important;
+}
+
+.darkred {
+    color: #c63e21 !important;
+}
+
+.darkgreen {
+    color: darkgreen !important;
+}
+
+.form-wrapper {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+/* 스크롤바 스타일 */
+::-webkit-scrollbar {
+    width: 7px; /* 스크롤바 너비 */
+}
+
+::-webkit-scrollbar-track {
+    background: #444; /* 스크롤바 트랙 색상 */
+}
+
+::-webkit-scrollbar-thumb {
+    background: #3f48cc; /* 스크롤바 thumb 색상 */
+    border-radius: 0;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #4a5de0; /* hover 시 색상 변경 */
+}
+
+/* sweetalert 관련 */
+.swal2-popup {
+    background-color: #2b2d31;
+    color: white;
+    border-radius: 0;
+}
+
+.swal2-content {
+    font-size: 15px;
+}
+
+.swal2-confirm {
+    background-color: #3f48cc;
+    color: white;
+    border-radius: 0;
+}
+
+.swal2-confirm:hover {
+    background-color: #4a5de0;
+    color: white;
+}
+
+

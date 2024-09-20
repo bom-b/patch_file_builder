@@ -1,0 +1,12 @@
+source_file_search_mode = autoSearch
+target_path_search_mode = setRootPath
+
+
+# backup_mode : Target의 원본파일이 덮어쓰기 되기전 파일을 백업하는 방법
+# 아래 옵션 중 선택하여 기입
+# dateSuffix1 - 원본파일에 현재날짜(_yyyyMMdd형식)를 뒤에 붙여 백업파일 생성합니다. 기존 백업파일은 지우지 않습니다.
+# dateSuffix2 - dateSuffix1과 동일하게 작동하고 _yyyyMMdd형식의 기존 백업파일들을 모두 지웁니다.
+# backupToFolder - 원본파일을 별도의 백업폴더에 복사합니다. (run.sh가 위치하는 경로에 백업폴더가 생성됨)
+# noBackup - 백업하지 않음.
+
+backup_mode = dateSuffix2
