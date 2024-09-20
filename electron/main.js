@@ -1,7 +1,8 @@
 // main.js
-const { app, BrowserWindow, autoUpdater } = require('electron');
+const { app, BrowserWindow, dialog } = require('electron');
 const path  = require('path');
 const { fileURLToPath }  = require('url');
+const { autoUpdater } = require('electron-updater');
 
 const {registerIpcHandlers,sqlHandlers} = require('./ipcHandler');
 const { closeDatabase } = require('./database');
@@ -39,7 +40,48 @@ function createWindow() {
     sqlHandlers(mainWindow);
 }
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+    createWindow();
+
+    // 자동 업데이트 체크
+    autoUpdater.checkForUpdatesAndNotify();
+
+    autoUpdater.on('update-available', (info) => {
+        console.log('업데이트가 가능합니다.');
+        dialog.showMessageBox(mainWindow, {
+            type: 'info',
+            buttons: ['업데이트', '취소'],
+            title: '업데이트 알림',
+            message: '새로운 업데이트가 있습니다.'
+        }).then((result) => {
+            if (result.response === 0) {
+                autoUpdater.downloadUpdate();
+            }
+        });
+    });
+
+    autoUpdater.on('update-not-available', () => {
+        console.log('최신 버전 입니다.');
+    });
+
+    autoUpdater.on('error', (error) => {
+       console.log('업데이트 오류 : ' + error);
+    });
+
+    autoUpdater.on('update-downloaded', (info) => {
+        console.log('업데이트 다운로드 완료', info);
+        dialog.showMessageBox(mainWindow, {
+            type: 'info',
+            buttons: ['재시작', '나중에'],
+            title: '업데이트 다운로드 완료',
+            message: '업데이트가 다운로드 되었습니다. 지금 설치하시겠습니까?'
+        }).then((result) => {
+            if (result.response === 0) {
+                autoUpdater.quitAndInstall();
+            }
+        })
+    })
+});
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
