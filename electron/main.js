@@ -44,7 +44,7 @@ app.whenReady().then(() => {
     createWindow();
 
     // 자동 업데이트 체크
-    autoUpdater.checkForUpdatesAndNotify();
+    autoUpdater.checkForUpdates();
 
     autoUpdater.on('update-available', (info) => {
         console.log('업데이트가 가능합니다.');
