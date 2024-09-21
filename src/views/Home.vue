@@ -25,6 +25,8 @@ onMounted(() => {
 // 컴포넌트가 해제될 때 localStorage에 저장
 onBeforeUnmount(() => {
   localStorage.setItem('filePaths', JSON.stringify(filePaths.value));
+  localStorage.setItem('projectPath', projectPath.value);
+  localStorage.setItem('copyPath', copyPath.value);
 });
 
 // 파일 경로 추가 팝업 열기
@@ -52,8 +54,10 @@ function openPopup() {
 function getAllSettings() {
   window.slqAPI.getAllSettings().then(settings => {
     userSettings = settings;
-    projectPath.value = extractVal(userSettings, 'id', 'project_path');
-    copyPath.value = extractVal(userSettings, 'id', 'copy_path');
+    const projectPathSetting = extractVal(userSettings, 'id', 'project_path');
+    projectPath.value = localStorage.getItem('projectPath') === ''? projectPathSetting : localStorage.getItem('projectPath');
+    const copyPathSetting = extractVal(userSettings, 'id', 'copy_path');
+    copyPath.value = localStorage.getItem('copyPath') === ''? copyPathSetting : localStorage.getItem('copyPath');
   })
 }
 
