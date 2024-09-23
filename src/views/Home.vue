@@ -183,6 +183,8 @@ function makePatchFile() {
   window.slqAPI.updateSettings(params).then((result) => {
     console.log("변경완료! : " + result);
   });
+  localStorage.setItem('projectPath', projectPath.value);
+  localStorage.setItem('copyPath', copyPath.value);
 }
 </script>
 
