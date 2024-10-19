@@ -48,7 +48,7 @@ function openBrowser(link) {
       </div>
     </div>
     <div class="my-info-box">
-      <a id="blog-link" @click="openBrowser('https://bom-b.tistory.com/')">더 자세한 사용방법은 블로그를 참고해주세요.</a>
+      <a id="blog-link" @click="openBrowser('https://bom-b.tistory.com/45')">더 자세한 사용방법은 블로그를 참고해주세요.</a>
       <div class="contact-box">
         <i class="fa-brands fa-github"></i>
         <p style="color: rgba(246, 246, 246, 0.64)">github : </p>
