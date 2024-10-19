@@ -1,4 +1,4 @@
-const { ipcMain, dialog } = require('electron');
+const { ipcMain, dialog, shell } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process');
@@ -7,7 +7,6 @@ const { utilExport } = require('./fileCopyUtilExport')
 // sql
 const { getAllSettings, getOneSettingById, updateSettings } = require('./sql/userInput');
 const { getUsersPreset, getAllPreset, insertPreset } = require('./sql/preset');
-const {autoUpdater} = require("electron-updater");
 
 function registerIpcHandlers(mainWindow) {
     // 최소화, 최대화, 종료 이벤트 처리
@@ -33,6 +32,11 @@ function registerIpcHandlers(mainWindow) {
             properties: ['openDirectory'] // 폴더만 선택 가능
         });
         return result.filePaths[0]; // 선택한 폴더의 경로 반환
+    });
+
+    // 기본 브라우저로 링크 열기
+    ipcMain.on('open-browser', (event, link) => {
+        shell.openExternal(link);
     });
 
     // 클래스 파일 찾기
@@ -151,7 +155,11 @@ function registerIpcHandlers(mainWindow) {
                     // 경로에 해당하는 폴더가 없으면 생성
                     const dir = path.dirname(destinationPath);
                     if (!fs.existsSync(dir)) {
-                        fs.mkdirSync(dir, { recursive: true });
+                        try {
+                            fs.mkdirSync(dir, {recursive: true});
+                        } catch (error) {
+                            notExistsPaths.push(pathInfo.path);
+                        }
                     }
 
                     if (fs.existsSync(sourcePath)) {

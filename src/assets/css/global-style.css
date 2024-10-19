@@ -100,6 +100,7 @@ input[type="checkbox"] {
     min-height: 30px;
     transition: background-color 0.3s ease, color 0.3s ease;
     font-size: 15px;
+    padding: 0 8px;
 }
 
 .btn-setting:hover {
@@ -128,7 +129,7 @@ input[type="checkbox"] {
     background-color: #2b2d31 !important;
     color: rgba(246, 246, 246, 0.64) !important;
     padding: 0 10px;
-    height: 30px;
+    height: 30px !important;
 }
 
 .form-control2:focus {
@@ -175,6 +176,7 @@ p {
 /* 스크롤바 스타일 */
 ::-webkit-scrollbar {
     width: 7px; /* 스크롤바 너비 */
+    height: 7px;
 }
 
 ::-webkit-scrollbar-track {
@@ -182,12 +184,16 @@ p {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #3f48cc; /* 스크롤바 thumb 색상 */
+    background: #8a8a8a; /* 스크롤바 thumb 색상 */
     border-radius: 0;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #4a5de0; /* hover 시 색상 변경 */
+    background: #aeaeae; /* hover 시 색상 변경 */
+}
+
+::-webkit-scrollbar-corner {
+    background: #2b2d31; /* 교차점 배경색 */
 }
 
 /* sweetalert 관련 */
@@ -212,4 +218,29 @@ p {
     color: white;
 }
 
+.help-icon {
+    margin-left: 10px;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #313337;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
 
+.help-icon:hover {
+    background-color: #36383c;
+}
+
+.help-icon:hover p {
+    color: #ffffff; /* hover 상태에서 p 색상 변경 */
+}
+
+.help-icon p {
+    color: #6e6e6e;
+    font-weight: bold;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}

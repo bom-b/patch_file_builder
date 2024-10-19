@@ -28,7 +28,7 @@ function createWindow() {
 
     // 개발 모드인지 확인
     if (process.env.NODE_ENV === 'development') {
-        mainWindow.loadURL('http://localhost:5173'); // Vue 앱의 기본 URL
+        mainWindow.loadURL('http://localhost:3000'); // Vue 앱의 기본 URL
         mainWindow.webContents.openDevTools();
     } else {
         // 빌드된 파일 경로를 사용

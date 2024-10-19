@@ -1,4 +1,8 @@
 <script setup>
+import {defineEmits} from 'vue';
+
+const emit = defineEmits(['openHelpPage']);
+
 function minimize() {
   window.winAPI.minimize();
 }
@@ -9,6 +13,10 @@ function maximize() {
 
 function close() {
   window.winAPI.close();
+}
+
+function openHelpPage() {
+  emit('openHelpPage');
 }
 </script>
 
@@ -21,6 +29,7 @@ function close() {
       </div>
     </div>
     <div>
+      <button class="header-btn" @click="$emit('open-help')"><i class="fa-solid fa-question"></i></button>
       <button class="header-btn" @click="minimize"><i class="fas fa-minus"></i></button>
       <button class="header-btn" @click="maximize"><i class="far fa-square"></i></button>
       <button class="header-btn2" @click="close"><i class="fas fa-x"></i></button>

@@ -1,12 +1,26 @@
 <script setup>
 import {onMounted, onBeforeUnmount, ref} from 'vue';
 import PopUp from '../components/HomePopup.vue'
+import AutoComplete from '../components/AutoComplete.vue'
 import Swal from 'sweetalert2';
+import {
+  extractVal,
+  appendInputHistory,
+  getLastValueFromInputHistory,
+  getAllValueFromInputHistory
+} from "@/assets/js/common";
 
 let userSettings = [];
 
 const projectPath = ref('');
+const projectPathHistory = ref([]);
 const copyPath = ref('');
+const copyPathHistory = ref([]);
+
+const refs = {
+  projectPath,
+  copyPath
+};
 
 // 파일경로들
 const filePaths = ref(JSON.parse(localStorage.getItem('filePaths')) || {});
@@ -17,6 +31,7 @@ const notExistsPaths = ref([]);
 const selectedPathMode = ref('original');
 
 const popupRef = ref(null);
+const autoCompleteRef = ref(null);
 
 onMounted(() => {
   getAllSettings();
@@ -25,13 +40,13 @@ onMounted(() => {
 // 컴포넌트가 해제될 때 localStorage에 저장
 onBeforeUnmount(() => {
   localStorage.setItem('filePaths', JSON.stringify(filePaths.value));
-  localStorage.setItem('projectPath', projectPath.value);
-  localStorage.setItem('copyPath', copyPath.value);
+  appendInputHistory('project_path', projectPath.value);
+  appendInputHistory('copy_path', copyPath.value);
 });
 
 // 파일 경로 추가 팝업 열기
 function openPopup() {
-  if(projectPath.value.length < 1) {
+  if (projectPath.value.length < 1) {
     Swal.fire({
       showClass: {
         popup: ''
@@ -54,20 +69,22 @@ function openPopup() {
 function getAllSettings() {
   window.slqAPI.getAllSettings().then(settings => {
     userSettings = settings;
-    const projectPathSetting = extractVal(userSettings, 'id', 'project_path');
-    projectPath.value = localStorage.getItem('projectPath') === ''? projectPathSetting : localStorage.getItem('projectPath');
-    const copyPathSetting = extractVal(userSettings, 'id', 'copy_path');
-    copyPath.value = localStorage.getItem('copyPath') === ''? copyPathSetting : localStorage.getItem('copyPath');
-  })
+
+    projectPath.value = getSettingsValue(userSettings, 'project_path');
+    copyPath.value = getSettingsValue(userSettings, 'copy_path');
+
+    projectPathHistory.value = getAllValueFromInputHistory('project_path');
+    copyPathHistory.value = getAllValueFromInputHistory('copy_path');
+  });
 }
 
-// SQL로 가져온 데이터에서 키로 값 추출하는 함수
-function extractVal(dataList, key, keyVal) {
-  const found = dataList.find(data => data[key] === keyVal);
-  return found? found.value : null;
+function getSettingsValue(userSettings, settingsKey) {
+  const dbValue = extractVal(userSettings, 'id', settingsKey);
+  const localstorageValue = getLastValueFromInputHistory(settingsKey);
+  return localstorageValue === null ? dbValue : localstorageValue;
 }
 
-function setprojectPath() {
+function setProjectPath() {
   window.fileAPI.openFolder().then((path) => {
     if (path) {
       projectPath.value = path; // 선택한 경로를 입력 필드에 설정
@@ -84,13 +101,29 @@ function setCopyPath() {
 }
 
 async function updateFilePath(filePathList) {
+
   // 경로변경설정 가져오기
   const usersPreset = await window.slqAPI.getUsersPreset();
+
   // 존재하지 않는 파일 목록 초기화
   notExistsPaths.value = [];
+
   filePathList.sort();
   filePathList.forEach((path) => {
-    const subPath = path.replace(projectPath.value, '').replace(/\\/g, '/');
+
+    const replacedProjectPath = projectPath.value.replace(/\\/g, '/');
+    path = path.replace(/\\/g, '/');
+
+    let subPath;
+    let fullPath;
+    if (path.includes(replacedProjectPath)) {
+      subPath = path.replace(replacedProjectPath, '');
+      fullPath = path;
+    } else {
+      subPath = path;
+      fullPath = replacedProjectPath + path;
+    }
+
     const extName = subPath.substring(subPath.lastIndexOf('.') + 1);
 
     // 경로변경설정대로 변환
@@ -99,7 +132,7 @@ async function updateFilePath(filePathList) {
       convertPath = convertPath.replace(preset.before_val, preset.after_val);
     })
 
-    const newElement = {use: true, path: subPath, convertPath: convertPath, fullPath: path};
+    const newElement = {use: true, path: subPath, convertPath: convertPath, fullPath: fullPath};
 
     if (filePaths.value[extName]) {
       filePaths.value[extName].push(newElement);
@@ -123,7 +156,7 @@ function fileUseToggle(fileType, event) {
 }
 
 function makePatchFile() {
-  if(copyPath.value.length < 1) {
+  if (copyPath.value.length < 1) {
     Swal.fire({
       showClass: {
         popup: ''
@@ -139,7 +172,7 @@ function makePatchFile() {
     return;
   }
 
-  if(Object.keys(filePaths.value).length < 1) {
+  if (Object.keys(filePaths.value).length < 1) {
     Swal.fire({
       showClass: {
         popup: ''
@@ -173,6 +206,7 @@ function makePatchFile() {
     localStorage.removeItem('filePaths');
     notExistsPaths.value = newNotExistsPaths;
     Swal.close();
+
   });
 
   // 경로설정 저장
@@ -183,9 +217,23 @@ function makePatchFile() {
   window.slqAPI.updateSettings(params).then((result) => {
     console.log("변경완료! : " + result);
   });
-  localStorage.setItem('projectPath', projectPath.value);
-  localStorage.setItem('copyPath', copyPath.value);
+  appendInputHistory('project_path', projectPath.value);
+  appendInputHistory('copy_path', copyPath.value);
 }
+
+function showAutoComplete(element, target, items) {
+    const rect = element.getBoundingClientRect();
+    const coordinates = {
+      left: rect.left,   // 왼쪽 좌표
+      bottom: rect.bottom // 아래쪽 좌표
+    };
+    autoCompleteRef.value.show(coordinates, target, items);
+}
+
+function updateInput(target, item) {
+  refs[target].value = item;
+}
+
 </script>
 
 <template>
@@ -195,12 +243,21 @@ function makePatchFile() {
       <h4 style="margin-bottom: 10px; color: rgba(246, 246, 246, 0.64);">경로 설정</h4>
       <div class="form-wrapper">
         <label for="project-path" style="">작업 프로젝트 경로 : </label>
-        <input id="project-path" v-model="projectPath" class="form-control2" style="margin-left: 20px; width: 600px;">
-        <button class="btn-setting" style="margin-left: 5px;" @click="setprojectPath()">폴더 선택</button>
+        <input id="project-path"
+               @focus="(event) => showAutoComplete(event.target, 'projectPath', projectPathHistory)"
+               v-model="projectPath"
+               class="form-control2" style="margin-left: 20px; width: 600px;"/>
+        <button class="btn-setting" style="margin-left: 5px;" @click="setProjectPath()">폴더 선택</button>
+        <!-- <div class="help-icon">
+          <p>?</p>
+        </div> -->
       </div>
       <div class="form-wrapper">
         <label for="copy-path" style="">파일을 복사할 경로 : </label>
-        <input id="copy-path" v-model="copyPath" class="form-control2" style="margin-left: 20px; width: 600px;">
+        <input id="copy-path"
+               @focus="(event) => showAutoComplete(event.target, 'copyPath', copyPathHistory)"
+               v-model="copyPath" class="form-control2"
+               style="margin-left: 20px; width: 600px;">
         <button class="btn-setting" style="margin-left: 5px;" @click="setCopyPath()">폴더 선택</button>
       </div>
       <div class="form-wrapper" style="margin-top: 40px;">
@@ -225,29 +282,32 @@ function makePatchFile() {
       <div id="file-list">
 
         <div class="files-container" v-for="(files, fileType) in filePaths" :key="fileType">
-          <div class="folder-container" >
+          <div class="folder-container">
             <!--<i class="fa-solid fa-chevron-down"></i>-->
-            <input class="file-use" type="checkbox" checked style="margin-right: 5px;" @click="fileUseToggle(fileType, $event)">
+            <input class="file-use" type="checkbox" checked style="margin-right: 5px;"
+                   @click="fileUseToggle(fileType, $event)">
             <i class="fa-regular fa-folder fa-lg"></i>
             <p class="folder-name">{{ fileType }}</p>
           </div>
           <div :id="fileType + '-folder'">
             <div class="file" v-for="file in files" :key="file.path">
               <input class="file-use" type="checkbox" v-model="file.use" style="margin-right: 10px;">
-              <p v-if="selectedPathMode === 'original'" :class="file.use? '' : 'not-use-file'">{{ file.path }}</p>
-              <p v-if="selectedPathMode === 'changed'" :class="file.use? '' : 'not-use-file'">{{ file.convertPath }}</p>
+              <p class="path-text" v-if="selectedPathMode === 'original'" :class="file.use? '' : 'not-use-file'">
+                {{ file.path }}</p>
+              <p class="path-text" v-if="selectedPathMode === 'changed'" :class="file.use? '' : 'not-use-file'">
+                {{ file.convertPath }}</p>
             </div>
           </div>
         </div>
 
         <div class="files-container" v-if="notExistsPaths.length > 0">
-          <div class="folder-container" >
+          <div class="folder-container">
             <i class="fa-regular fa-folder fa-lg darkred"></i>
             <p class="folder-name darkred">존재하지 않는 파일이 있습니다. 목록을 확인해 주세요.</p>
           </div>
           <div>
             <div class="file" v-for="path in notExistsPaths" :key="path">
-              <p class="darkred">{{ path }}</p>
+              <p class="path-text darkred">{{ path }}</p>
             </div>
           </div>
         </div>
@@ -267,6 +327,7 @@ function makePatchFile() {
     </div>
   </div>
   <PopUp ref="popupRef" @update-file-path="updateFilePath"/>
+  <AutoComplete ref="autoCompleteRef" @update-input="updateInput" />
 </template>
 
 <style scoped>
@@ -293,7 +354,7 @@ function makePatchFile() {
   justify-content: end;
 }
 
-#list-menu1 div{
+#list-menu1 div {
   display: flex;
   padding: 0 10px;
   color: rgba(246, 246, 246, 0.64);
@@ -317,13 +378,13 @@ function makePatchFile() {
   justify-content: start;
 }
 
-.file{
+.file {
   display: flex;
   height: 27px;
   padding-left: 30px;
 }
 
-.file:hover{
+.file:hover {
   background-color: rgba(10, 83, 190, 0.07);
 }
 
@@ -350,6 +411,11 @@ function makePatchFile() {
 
 .not-use-file {
   color: rgba(246, 246, 246, 0.45);
+}
+
+.path-text {
+  white-space: nowrap;
+  -webkit-user-select: text;
 }
 
 </style>

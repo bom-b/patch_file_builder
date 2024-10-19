@@ -1,0 +1,58 @@
+#container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.box {
+    margin-bottom: 50px;
+}
+
+.contact-box {
+    display: flex;
+    align-items: center;
+}
+
+.contact-box i {
+    color: rgba(246, 246, 246, 0.64);
+    margin-right: 5px;
+}
+
+.contact-box p:last-of-type{
+    margin-left: 10px;
+    -webkit-user-select: text;
+}
+
+.title-box {
+    display: flex;
+    align-items: center;
+}
+
+.explanation {
+    margin-left: 20px;
+    margin-top: 10px;
+}
+
+.explanation p {
+    color: rgba(246, 246, 246, 0.64);
+}
+
+.my-info-box {
+    padding-top: 100px;
+    padding-bottom: 30px;
+}
+
+#blog-link {
+    text-decoration: underline;
+    text-decoration-color: rgba(246, 246, 246, 0.21);
+    text-decoration-thickness: 1px;
+    color: rgba(246, 246, 246, 0.64);
+    cursor: pointer;
+}
+
+#github-link {
+    color: rgb(93,131,220);
+    cursor: pointer;
+}
+
+

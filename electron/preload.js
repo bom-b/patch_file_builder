@@ -3,7 +3,8 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('winAPI', {
     minimize: () => ipcRenderer.send('minimize-window'),
     maximize: () => ipcRenderer.send('maximize-window'),
-    close: () => ipcRenderer.send('close-window')
+    close: () => ipcRenderer.send('close-window'),
+    openBrowser: (link) => ipcRenderer.send('open-browser', link)
 });
 
 contextBridge.exposeInMainWorld('fileAPI', {

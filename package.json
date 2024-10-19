@@ -1,6 +1,6 @@
 {
   "name": "patchfile_builder",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "private": true,
   "scripts": {
     "dev": "cross-env NODE_ENV=development vite",
@@ -26,7 +26,7 @@
     "directories": {
       "output": "dist_electron"
     },
-    "publish" : [
+    "publish": [
       {
         "provider": "github",
         "owner": "bom-b",

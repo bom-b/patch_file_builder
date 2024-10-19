@@ -64,8 +64,8 @@ defineExpose({showPopUp});
     <div id="popup" v-if="isVisible">
       <div>
         <p style="margin-bottom: 20px; font-weight: bold;">파일 경로 추가</p>
-        <p style="color: rgba(246, 246, 246, 0.64);">작업 프로젝트 경로를 포함하여 경로를 작성해주세요.</p>
-        <p style="color: rgba(246, 246, 246, 0.64);">줄바꿈으로 경로를 추가할 수 있습니다.</p>
+        <p style="color: rgba(246, 246, 246, 0.64);">줄바꿈으로 복사할 파일의 경로를 추가할 수 있습니다.</p>
+        <p style="color: rgba(246, 246, 246, 0.64);">경로구분자는 <span style="color: #ff7f27;">/</span>, <span style="color: #ff7f27;">\</span> 모두 사용 가능합니다.</p>
       </div>
       <textarea class="form-control" id="path-input" name="text" spellcheck="false" v-model="filePaths"
                 style="flex: 1; resize: none; width: 100%; height: 100%; margin-top: 20px;"></textarea>

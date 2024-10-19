@@ -6,6 +6,7 @@ const route = useRoute();
 const isActive = (path) => {
   return route.path === path;
 };
+
 </script>
 
 <template>
