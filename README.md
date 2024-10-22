@@ -19,11 +19,11 @@ yarn install
 vue 실행
 
 ```sh
-npm run dev
+yarn run dev
 ```
 
 electron 실행
 
 ```sh
-npm run electron:serve
+yarn run electron:serve
 ```
