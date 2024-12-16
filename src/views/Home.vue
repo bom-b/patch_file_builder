@@ -143,12 +143,13 @@ async function updateFilePath(filePathList) {
     const newElement = {use: true, path: subPath, convertPath: convertPath, fullPath: fullPath, desc: description};
 
     if (filePaths.value[extName]) {
-      filePaths.value[extName].forEach((element) => {
-        if (element.fullPath === newElement.fullPath) { // 중복된 파일이면 추가하지 않음
-          return;
-        }
-        filePaths.value[extName].push(newElement);
+      // 중복되지 않은 파일만 추가
+      const isExist = filePaths.value[extName].some((element) => {
+        return element.fullPath === newElement.fullPath;
       });
+      if (!isExist) {
+        filePaths.value[extName].push(newElement);
+      }
     } else {
       filePaths.value[extName] = [newElement];
     }
