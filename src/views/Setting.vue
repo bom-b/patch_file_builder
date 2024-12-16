@@ -32,7 +32,7 @@ onMounted(() => {
 });
 
 function getAllSettings() {
-  window.slqAPI.getAllSettings().then(settings => {
+  window.sqlAPI.getAllSettings().then(settings => {
     userSettings = settings;
     targetPath.value = getSettingsValue(userSettings, 'target_path');
     classPath.value = getSettingsValue(userSettings, 'class_path');
@@ -80,7 +80,7 @@ function saveSetting() {
       {id: 'class_path', value: classPath.value},
       {id: 'active_preset', value: usersIndex.value},
     ];
-    window.slqAPI.updateSettings(params).then((result) => {
+    window.sqlAPI.updateSettings(params).then((result) => {
       console.log("변경완료! : " + result);
     });
 

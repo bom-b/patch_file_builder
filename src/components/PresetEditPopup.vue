@@ -15,7 +15,7 @@ function showPopUp() {
 
   // 프리셋에 대해 초기화
   inputContainers.value = [[],[],[]];
-  window.slqAPI.getAllPreset().then((result) => {
+  window.sqlAPI.getAllPreset().then((result) => {
     result.forEach((preset) => {
       inputContainers.value[preset.id].push({ id: preset.id, before_val: preset.before_val, after_val: preset.after_val });
     })
@@ -64,7 +64,7 @@ function savePreset() {
     text: '요청을 처리중입니다.'
   });
   const presets = JSON.parse(JSON.stringify(inputContainers.value));
-  window.slqAPI.insertPreset(presets).then((result) => {
+  window.sqlAPI.insertPreset(presets).then((result) => {
     console.log("프리셋 저장완료!" );
     isVisible.value = false;
     emit('update-preset-index', activeTabIndex.value);

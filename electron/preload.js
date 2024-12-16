@@ -13,7 +13,7 @@ contextBridge.exposeInMainWorld('fileAPI', {
     makePatchFile: (copyPath, paths) =>  ipcRenderer.invoke('make-patchFile', copyPath, paths)
 });
 
-contextBridge.exposeInMainWorld('slqAPI', {
+contextBridge.exposeInMainWorld('sqlAPI', {
     getAllSettings: () => ipcRenderer.invoke('sql:getAllSettings'),
     updateSettings: (param) => ipcRenderer.invoke('sql:updateSettings', param),
 

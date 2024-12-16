@@ -67,7 +67,7 @@ function openPopup() {
 }
 
 function getAllSettings() {
-  window.slqAPI.getAllSettings().then(settings => {
+  window.sqlAPI.getAllSettings().then(settings => {
     userSettings = settings;
 
     projectPath.value = getSettingsValue(userSettings, 'project_path');
@@ -100,10 +100,11 @@ function setCopyPath() {
   });
 }
 
+// 파일 업로드 팝업으로부터 받은 경로들을 통해 GUI 업데이트
 async function updateFilePath(filePathList) {
 
   // 경로변경설정 가져오기
-  const usersPreset = await window.slqAPI.getUsersPreset();
+  const usersPreset = await window.sqlAPI.getUsersPreset();
 
   // 존재하지 않는 파일 목록 초기화
   notExistsPaths.value = [];
@@ -111,9 +112,11 @@ async function updateFilePath(filePathList) {
   filePathList.sort();
   filePathList.forEach((path) => {
 
+    // 작업 프로젝트 경로와 파일 경로를 비교하기 위해 경로 구분자 통일
     const replacedProjectPath = projectPath.value.replace(/\\/g, '/');
     path = path.replace(/\\/g, '/');
 
+    // 전체경로와 작업프로젝트 경로를 제외한 경로 구하기
     let subPath;
     let fullPath;
     if (path.includes(replacedProjectPath)) {
@@ -124,15 +127,20 @@ async function updateFilePath(filePathList) {
       fullPath = replacedProjectPath + path;
     }
 
+    // 확장자 구하기
     const extName = subPath.substring(subPath.lastIndexOf('.') + 1);
 
-    // 경로변경설정대로 변환
+    // 경로변경설정대로 변환된 경로 구하기
     let convertPath = subPath;
     usersPreset.forEach((preset) => {
       convertPath = convertPath.replace(preset.before_val, preset.after_val);
     })
 
-    const newElement = {use: true, path: subPath, convertPath: convertPath, fullPath: fullPath};
+    // 필요시 설명 추가
+    let description = getDescription(path);
+
+    // 경로 하나에 대한 정보
+    const newElement = {use: true, path: subPath, convertPath: convertPath, fullPath: fullPath, desc: description};
 
     if (filePaths.value[extName]) {
       filePaths.value[extName].push(newElement);
@@ -141,6 +149,21 @@ async function updateFilePath(filePathList) {
     }
   });
   localStorage.setItem('filePaths', JSON.stringify(filePaths.value));
+}
+
+// 파일 경로에서 파일명만 추출
+function getFileName(filePath) {
+  return filePath.split(/[/\\]/).pop();
+}
+
+// 파일에 대한 설명 추가
+function getDescription(path) {
+  let description = null;
+  const fileName = getFileName(path);
+  if (fileName.endsWith('.class') && fileName.includes('$')) {
+    description = '[ 내부 클래스 ]';
+  }
+  return description;
 }
 
 function filePathsClear() {
@@ -214,7 +237,7 @@ function makePatchFile() {
     {id: 'project_path', value: projectPath.value},
     {id: 'copy_path', value: copyPath.value}
   ];
-  window.slqAPI.updateSettings(params).then((result) => {
+  window.sqlAPI.updateSettings(params).then((result) => {
     console.log("변경완료! : " + result);
   });
   appendInputHistory('project_path', projectPath.value);
@@ -292,10 +315,13 @@ function updateInput(target, item) {
           <div :id="fileType + '-folder'">
             <div class="file" v-for="file in files" :key="file.path">
               <input class="file-use" type="checkbox" v-model="file.use" style="margin-right: 10px;">
-              <p class="path-text" v-if="selectedPathMode === 'original'" :class="file.use? '' : 'not-use-file'">
-                {{ file.path }}</p>
-              <p class="path-text" v-if="selectedPathMode === 'changed'" :class="file.use? '' : 'not-use-file'">
-                {{ file.convertPath }}</p>
+              <span class="path-text" v-if="selectedPathMode === 'original'" :class="file.use? '' : 'not-use-file'">
+                {{ file.path }}</span>
+              <span class="path-text" v-if="selectedPathMode === 'changed'" :class="file.use? '' : 'not-use-file'">
+                {{ file.convertPath }}</span>
+              <span class="path-desc" v-if="file.desc !== null">
+                {{ file.desc }}
+              </span>
             </div>
           </div>
         </div>
@@ -416,6 +442,11 @@ function updateInput(target, item) {
 .path-text {
   white-space: nowrap;
   -webkit-user-select: text;
+}
+
+.path-desc {
+  color: rgba(246, 246, 246, 0.64);
+  margin-left: 15px;
 }
 
 </style>

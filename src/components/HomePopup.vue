@@ -29,7 +29,9 @@ function submit(){
     allowEscapeKey: false,
     text: '요청을 처리중입니다.'
   });
-  const paths = filePaths.value.split('\n').map(path => path.trim()).filter(path => path);
+
+  // 경로 중복 제거
+  const paths = [...new Set(filePaths.value.split('\n').map(path => path.trim()).filter(path => path))];
   window.fileAPI.findClassFile(paths).then((result) => {
     if (result === "err1") {
       Swal.fire({

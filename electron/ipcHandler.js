@@ -55,11 +55,13 @@ function registerIpcHandlers(mainWindow) {
             return "err1"; // 경로가 없으면 종료
         }
 
+        // 최종적으로 반환할 경로들 (class파일 포함)
         let result = [];
 
         // 프로젝트 내에서 .class 파일을 찾는 함수
+        // 내부 클래스로 인해 생성된 .class 파일도 함께 찾음
         function findClassFilesInProject(javaFilePath) {
-            const classFileName = path.basename(javaFilePath, '.java') + '.class'; // .java에서 .class로 변경
+            const classFileName = path.basename(javaFilePath, '.java');
             const classFilePaths = []; // 모든 .class 파일 경로를 저장할 배열
 
             // 재귀적으로 디렉토리를 탐색하는 함수
@@ -69,11 +71,10 @@ function registerIpcHandlers(mainWindow) {
                 items.forEach(item => {
                     const currentPath = path.join(directory, item);
                     const stats = fs.statSync(currentPath); // 현재 항목의 상태를 가져옴
-
                     if (stats.isDirectory()) {
                         // 디렉토리인 경우 재귀 호출
                         searchDirectory(currentPath);
-                    } else if (stats.isFile() && item === classFileName) {
+                    } else if (stats.isFile() && (item === classFileName + '.class' || (item.startsWith(classFileName + '$') && item.endsWith('.class')))) {
                         // .class 파일인 경우
                         classFilePaths.push(currentPath); // 경로 추가
                     }
@@ -86,19 +87,36 @@ function registerIpcHandlers(mainWindow) {
         }
 
         // javaFilePath과 경로가 가장 가까운 classFilePath 찾기
-        function findClosestFile(javaFilePath, classFilePaths) {
-            const javaDirPath = path.dirname(javaFilePath);
-            const javaDirParts = javaDirPath.split(path.sep).reverse();
+        // classFilePath 내부에 있는 모든 클래스 파일의 경로 (내부클래스로 인한 클래스파일까지) 반환
+        function findCorrectClassFile(javaFilePath, classFilePaths) {
 
-            let closestMatch = null;
+            // 경로 중에 중복되는 파일명이 있는지 확인
+            // 중복되는 파일명이 없다면 그대로 반환
+            let hasDuplicateFileName = false;
+            let classFileNamesSet = new Set();
+            classFilePaths.forEach((classFilePath) => {
+                const fileName = path.basename(classFilePath);
+                if (classFileNamesSet.has(fileName)) {
+                    hasDuplicateFileName = true;
+                } else {
+                    classFileNamesSet.add(fileName);
+                }
+            });
+            if (!hasDuplicateFileName) {
+                return classFilePaths;
+            }
+            
+            const javaDirPath = path.dirname(javaFilePath);
+            const javaDirParts = javaDirPath.split(/[/\\]/).reverse();
+
+            let closestMatch = null; // javaFilePath와 가장 가까운 경로
             let maxMatchingParts = 0;
 
             classFilePaths.forEach((classFilePath) => {
                 const classDirPath = path.dirname(classFilePath);
-                const classDirParts = classDirPath.split(path.sep).reverse();
+                const classDirParts = classDirPath.split(/[/\\]/).reverse();
 
                 let matchingParts = 0;
-
                 for(let i = 0; i < Math.min(javaDirParts.length, classDirParts.length); i++) {
                     if(javaDirParts[i] === classDirParts[i]) {
                         matchingParts++;
@@ -109,33 +127,36 @@ function registerIpcHandlers(mainWindow) {
 
                 if (matchingParts > maxMatchingParts) {
                     maxMatchingParts = matchingParts;
-                    closestMatch = classFilePath;
+                    closestMatch = classDirPath;
                 }
             });
 
-            return closestMatch;
+            return classFilePaths.filter((classFilePath) => path.dirname(classFilePath) === closestMatch);
         }
 
         paths.forEach((path) => {
             if (path.endsWith('.java')) { // .java로 끝나는 파일인지 확인
-
                 const classFilePaths = findClassFilesInProject(path);
                 let classFile = null;
+
                 if (classFilePaths) {
                     if (classFilePaths.length > 1) { // 같은 이름으로 발견되는 클래스파일이 여러개일때,
-                        classFile = findClosestFile(path, classFilePaths);
-                        console.log(classFile);
+                        const correctClassFiles = findCorrectClassFile(path, classFilePaths);
+                        correctClassFiles.forEach((correctClassFile) => {
+                           result.push(correctClassFile);
+                        });
                     } else {
                         classFile = classFilePaths[0]
                     }
-                    result.push(classFile);
+                    result.push(classFile); // 찾은 클래스 파일 경로 추가
                 }
-                result.push(path);
+                result.push(path); // 자바 파일 경로 추가
 
             } else { // .java 파일 아니면 그냥 푸쉬
                 result.push(path);
             }
         });
+
         return result;
     });
 
