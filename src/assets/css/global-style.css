@@ -45,12 +45,13 @@ input[type="checkbox"] {
 .btn-signature {
     background-color: #3f48cc;
     color: white;
-    border: none;
-    border-radius: 0;
-    padding: 10px 20px;
-    min-width: 20px;
-    min-height: 10px;
+    border: 1px solid #4e5157;
+    border-radius: 1px;
+    padding: 0 8px;
+    min-width: 70px;
+    min-height: 38px;
     transition: background-color 0.3s ease, color 0.3s ease;
+    font-size: 15px;
 }
 
 .btn-signature:hover {
@@ -62,11 +63,12 @@ input[type="checkbox"] {
 .btn-signature2 {
     background-color: #ff7f27;
     color: white;
-    border: none;
-    border-radius: 0;
+    border: 1px solid #4e5157;
+    border-radius: 1px;
     padding: 2px 5px;
     min-width: 40px;
     min-height: 10px;
+    font-size: 13px;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -78,11 +80,12 @@ input[type="checkbox"] {
 .btn-gray {
     background-color: #e7e7e7;
     color: #8a2b3e;
-    border: none;
-    border-radius: 0;
+    border: 1px solid #4e5157;
+    border-radius: 1px;
     padding: 2px 5px;
     min-width: 40px;
     min-height: 10px;
+    font-size: 13px;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
