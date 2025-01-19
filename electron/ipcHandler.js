@@ -6,7 +6,7 @@ const { utilExport } = require('./fileCopyUtilExport')
 
 // sql
 const { getAllSettings, getOneSettingById, updateSettings } = require('./sql/userInput');
-const { getUsersPreset, getAllPreset, insertPreset } = require('./sql/preset');
+const { getUsersPreset, getAllPreset, getPresetNameByIndex, insertPreset } = require('./sql/preset');
 
 function registerIpcHandlers(mainWindow) {
     // 최소화, 최대화, 종료 이벤트 처리
@@ -224,10 +224,14 @@ function sqlHandlers(mainWindow) {
         }
     });
 
-    //preset
-    ipcMain.handle('sql:insertPreset', async (event,presets) => {
+
+    /*
+    * preset
+    */
+
+    ipcMain.handle('sql:getUsersPreset', async () => {
         try {
-            return await insertPreset(presets);
+            return await getUsersPreset();
         } catch (error) {
             throw error;
         }
@@ -241,9 +245,17 @@ function sqlHandlers(mainWindow) {
         }
     });
 
-    ipcMain.handle('sql:getUsersPreset', async () => {
+    ipcMain.handle('sql:getPresetNameByIndex', async (event, index) => {
         try {
-            return await getUsersPreset();
+            return await getPresetNameByIndex(index);
+        } catch (error) {
+            throw error;
+        }
+    });
+
+    ipcMain.handle('sql:insertPreset', async (event,presetNames, presets) => {
+        try {
+            return await insertPreset(presetNames, presets);
         } catch (error) {
             throw error;
         }

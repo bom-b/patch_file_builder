@@ -18,6 +18,7 @@ const classPathHistory = ref([]);
 const isMakeProgram = ref(true)
 const isFindClass = ref(true);
 const usersIndex = ref('0');
+const activePresetName = ref('');
 
 const refs = {
   targetPath,
@@ -38,6 +39,7 @@ function getAllSettings() {
     classPath.value = getSettingsValue(userSettings, 'class_path');
     isFindClass.value = getSettingsValue(userSettings, 'is_find_class') == '1';
     usersIndex.value = getSettingsValue(userSettings, 'active_preset');
+    activePresetName.value = getSettingsValue(userSettings, 'active_preset_name');
 
     targetPathHistory.value = getAllValueFromInputHistory('target_path');
     classPathHistory.value = getAllValueFromInputHistory('class_path');
@@ -104,24 +106,10 @@ function editPreset() {
 
 // 선택된 프리셋 수정
 function updatePresetIndex(choiceIndex) {
-  usersIndex.value = choiceIndex.toString();
-}
-
-// 선택된 프리셋 텍스트
-function usersPresetText() {
-  let text = '';
-  switch (usersIndex.value) {
-    case '0':
-      text = '프리셋1'
-      break;
-    case '1':
-      text = '프리셋2'
-      break;
-    case '2':
-      text = '프리셋3'
-      break;
-  }
-  return text;
+  window.sqlAPI.getPresetNameByIndex(choiceIndex).then(result => {
+    activePresetName.value = result.name;
+    usersIndex.value = choiceIndex.toString();
+  })
 }
 
 function showAutoComplete(element, target, items) {
@@ -176,7 +164,7 @@ function updateInput(target, item) {
         </div>
         <div style="display: flex; align-items: center; margin-top: 20px;">
           <p style="">선택된 설정 : </p>
-          <p style="margin-left: 10px; color:#ff7f27;">{{ usersPresetText() }}</p>
+          <p style="margin-left: 10px; color:#ff7f27;">{{ activePresetName }}</p>
         </div>
         <div style="display: flex; align-items: center; justify-content: end; margin-top: 20px; padding-right: 10px;">
           <button class="btn-setting" style="margin-left: 5px;" @click="editPreset()">프리셋 편집</button>

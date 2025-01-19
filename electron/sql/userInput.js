@@ -3,7 +3,7 @@ const { db } = require('./../database'); // database.js에서 db 가져오기
 
 // 모든 설정값 가져오기
 function getAllSettings() {
-    const sql = `SELECT id, value FROM settings`;
+    const sql = `SELECT id, value FROM settings UNION SELECT 'active_preset_name' AS id, name AS value FROM preset_info WHERE id = (SELECT value FROM settings WHERE id = 'active_preset')`;
     return new Promise((resolve, reject) => {
         db.all(sql, [], (err, rows) => {
             if (err) {

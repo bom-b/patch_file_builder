@@ -5,21 +5,36 @@ import Swal from "sweetalert2";
 const emit = defineEmits(['update-preset-index']);
 
 const isVisible = ref(false);
+const isPresetNameEditing = ref([false, false, false]);
 const filePaths = ref('');
 
 const activeTabIndex = ref(0);
 const inputContainers = ref([[],[],[]]);
+const presetNames = ['프리셋 1', '프리셋 2', '프리셋 3'];
 
-function showPopUp() {
-  isVisible.value = true;
+async function showPopUp() {
+
+  // 기존에 유저가 선택한 프리셋을 액티브 탭으로
+  const usersPreset = await window.sqlAPI.getUsersPreset();
+  activeTabIndex.value =  usersPreset[0].id;
 
   // 프리셋에 대해 초기화
   inputContainers.value = [[],[],[]];
   window.sqlAPI.getAllPreset().then((result) => {
+    // 프리셋 이름 초기화
+    presetNames.forEach((_, index) => {
+      const preset = result.find(p => p.id === index);
+      if (preset) {
+        presetNames[index] = preset.name;
+      }
+    });
+    // 프리셋 값 초기화
     result.forEach((preset) => {
       inputContainers.value[preset.id].push({ id: preset.id, before_val: preset.before_val, after_val: preset.after_val });
-    })
+    });
   });
+
+  isVisible.value = true;
 }
 
 function hidePopUp() {
@@ -28,6 +43,7 @@ function hidePopUp() {
 
 function setActiveTab(index) {
   activeTabIndex.value = index;
+  savePresetName();
 }
 
 const isActive = (index) => {
@@ -50,6 +66,31 @@ function updateInputValue(index, field, value) {
   inputContainers.value[activeTabIndex.value][index][field] = value;
 }
 
+// 프리셋 이름 수정
+function editPresetName(index) {
+  isPresetNameEditing.value[index] = true;
+  savePresetName();
+}
+
+// 프리셋 이름 저장
+function savePresetName(index) {
+
+  // 만약 빈 문자열로 저장한다면 프리셋으로 이름 초기화
+  if (presetNames[activeTabIndex.value] === "") {
+    presetNames[activeTabIndex.value] = "프리셋" + (activeTabIndex.value + 1);
+  }
+
+  if (index !== undefined) {
+    isPresetNameEditing.value[index] = false;
+  } else {
+    isPresetNameEditing.value.forEach((_, index) => {
+      if (index !== activeTabIndex.value) {
+        isPresetNameEditing.value[index] = false;
+      }
+    });
+  }
+}
+
 function savePreset() {
   Swal.fire({
     showConfirmButton: false,
@@ -63,8 +104,11 @@ function savePreset() {
     allowEscapeKey: false,
     text: '요청을 처리중입니다.'
   });
+
+  const presetNamesJson = JSON.parse(JSON.stringify(presetNames));
   const presets = JSON.parse(JSON.stringify(inputContainers.value));
-  window.sqlAPI.insertPreset(presets).then((result) => {
+
+  window.sqlAPI.insertPreset(presetNamesJson, presets).then((result) => {
     console.log("프리셋 저장완료!" );
     isVisible.value = false;
     emit('update-preset-index', activeTabIndex.value);
@@ -87,18 +131,13 @@ defineExpose({showPopUp});
       </div>
       <div class="preset-container">
         <div id="menu">
-          <div :class="['tab', { deactivate: !isActive(0) }]" @click="setActiveTab(0)">
-            <p>프리셋1</p>
-          </div>
-          <div :class="['tab', { deactivate: !isActive(1) }]" @click="setActiveTab(1)">
-            <p>프리셋2</p>
-          </div>
-          <div :class="['tab', { deactivate: !isActive(2) }]" @click="setActiveTab(2)">
-            <p>프리셋3</p>
+          <div :class="['tab', { deactivate: !isActive(index) }]" @click="setActiveTab(index)" v-for="(presetName, index) in presetNames" :key="index">
+            <p v-if="!isPresetNameEditing[index]" @dblclick="editPresetName(index)">{{ presetNames[index] }}</p>
+            <input class="preset-name-input" v-else v-model="presetNames[index]" @blur="savePresetName(index)" @keyup.enter="savePresetName(index)"/>
           </div>
         </div>
 
-        <div id="preset-0" v-if="isActive(0)" class="preset-content">
+        <div id="preset-0" v-if="isActive(0)" class="preset-content" @click="savePresetName(activeTabIndex)">
           <div v-for="(container, index) in inputContainers[0]" :key="index" class="input-container">
             <div class="mini-btn" @click="removeInputContainer(index)">
               <i class="fas fa-minus"/>
@@ -116,7 +155,7 @@ defineExpose({showPopUp});
           </div>
         </div>
 
-        <div id="preset-1" v-if="isActive(1)" class="preset-content">
+        <div id="preset-1" v-if="isActive(1)" class="preset-content" @click="savePresetName(activeTabIndex)">
           <div v-for="(container, index) in inputContainers[1]" :key="index" class="input-container">
             <div class="mini-btn" @click="removeInputContainer(index)">
               <i class="fas fa-minus"/>
@@ -134,7 +173,7 @@ defineExpose({showPopUp});
           </div>
         </div>
 
-        <div id="preset-2" v-if="isActive(2)" class="preset-content">
+        <div id="preset-2" v-if="isActive(2)" class="preset-content" @click="savePresetName(activeTabIndex)">
           <div v-for="(container, index) in inputContainers[2]" :key="index" class="input-container">
             <div class="mini-btn" @click="removeInputContainer(index)">
               <i class="fas fa-minus"/>
@@ -267,10 +306,33 @@ i {
   color: #fff;
   background-color: #2b2d31;
   height: 35px;
-  width: 100px;
+  width: 140px;
   border-radius: 0 0 0 0;
   margin-right: 1px;
+  padding: 0 10px;
   transition: background-color 0.3s ease;
+}
+
+.tab p {
+  min-width: 100px;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.preset-name-input {
+  background-color: #1e1f22;
+  color: #fff;
+  width: 100%;
+  border: none;
+}
+
+.preset-name-input:focus {
+  outline: none;
+  border-bottom: 1px solid #4fc1f4;
 }
 
 .deactivate {

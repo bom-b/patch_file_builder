@@ -20,5 +20,6 @@ contextBridge.exposeInMainWorld('sqlAPI', {
     //preset
     getAllPreset: () => ipcRenderer.invoke('sql:getAllPreset'),
     getUsersPreset: () => ipcRenderer.invoke('sql:getUsersPreset'),
-    insertPreset: (presets) => ipcRenderer.invoke('sql:insertPreset', presets),
+    getPresetNameByIndex: (index) => ipcRenderer.invoke('sql:getPresetNameByIndex', index),
+    insertPreset: (presetNames, presets) => ipcRenderer.invoke('sql:insertPreset', presetNames, presets),
 });
