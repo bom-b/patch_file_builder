@@ -34,6 +34,45 @@ function registerIpcHandlers(mainWindow) {
         return result.filePaths[0]; // 선택한 폴더의 경로 반환
     });
 
+    // 프리셋 파일 저장
+    ipcMain.handle('dialog:savePresetFile', async (event, presetObj) => {
+        const defaultFileName = presetObj.presetName;
+        const result = await dialog.showSaveDialog(mainWindow, {
+            title: '프리셋 파일 저장',
+            defaultPath: `${defaultFileName}`, // 디폴트 파일명
+            filters: [
+                { name: 'Preset Files', extensions: ['preset'] } // 확장자 필터
+            ]
+        });
+
+        if (!result.canceled && result.filePath) {
+            const filePath = result.filePath.endsWith('.preset') ? result.filePath : `${result.filePath}.preset`;
+            fs.writeFileSync(filePath, JSON.stringify(presetObj, null, 2), 'utf-8');
+            return filePath; // 저장된 파일 경로 반환
+        } else {
+            return null; // 사용자가 취소한 경우
+        }
+    });
+
+    // 프리셋 파일 불러오기
+    ipcMain.handle('dialog:openPresetFile', async () => {
+        const result = await dialog.showOpenDialog(mainWindow, {
+            title: '프리셋 파일 불러오기',
+            filters: [
+                { name: 'Preset Files', extensions: ['preset'] } // 확장자 필터
+            ],
+            properties: ['openFile'] // 파일만 선택 가능
+        });
+
+        if (!result.canceled && result.filePaths.length > 0) {
+            const filePath = result.filePaths[0];
+            const fileContent = fs.readFileSync(filePath, 'utf-8');
+            return JSON.parse(fileContent); // 파일 내용을 JSON 객체로 반환
+        } else {
+            return null; // 사용자가 취소한 경우
+        }
+    });
+
     // 기본 브라우저로 링크 열기
     ipcMain.on('open-browser', (event, link) => {
         shell.openExternal(link);

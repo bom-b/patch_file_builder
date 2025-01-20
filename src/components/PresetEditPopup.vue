@@ -91,6 +91,45 @@ function savePresetName(index) {
   }
 }
 
+// 프리셋 내보내기
+function exportPreset() {
+  const presetName = presetNames[activeTabIndex.value];
+  const presetObj = {
+    "presetName" : presetName,
+    "presets" : inputContainers.value[activeTabIndex.value].map(({ id, ...rest }) => rest)
+  };
+  window.fileAPI.savePresetFile(presetObj);
+}
+
+// 프리셋 가져오기
+function importPreset() {
+  window.fileAPI.openPresetFile().then((presets) => {
+    if (presets) {
+      if (presets.presetName && presets.presets) {
+        presetNames[activeTabIndex.value] = presets.presetName;
+        inputContainers.value[activeTabIndex.value] = [];
+        presets.presets.forEach((preset) => {
+          inputContainers.value[activeTabIndex.value].push({ id: activeTabIndex.value, before_val: preset.before_val, after_val: preset.after_val });
+        })
+      } else {
+        Swal.fire({
+          showConfirmButton: true,
+          confirmButtonText: '확인',
+          showClass: {
+            popup: ''
+          },
+          hideClass: {
+            popup: ''
+          },
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          text: '올바르지 않은 파일 형태입니다.'
+        });
+      }
+    }
+  });
+}
+
 function savePreset() {
   Swal.fire({
     showConfirmButton: false,
@@ -131,63 +170,33 @@ defineExpose({showPopUp});
       </div>
       <div class="preset-container">
         <div id="menu">
-          <div :class="['tab', { deactivate: !isActive(index) }]" @click="setActiveTab(index)" v-for="(presetName, index) in presetNames" :key="index">
-            <p v-if="!isPresetNameEditing[index]" @dblclick="editPresetName(index)">{{ presetNames[index] }}</p>
-            <input class="preset-name-input" v-else v-model="presetNames[index]" @blur="savePresetName(index)" @keyup.enter="savePresetName(index)"/>
-          </div>
+            <div :class="['tab', { deactivate: !isActive(index) }]" @click="setActiveTab(index)" v-for="(presetName, index) in presetNames" :key="index">
+              <p v-if="!isPresetNameEditing[index]" @dblclick="editPresetName(index)">{{ presetNames[index] }}</p>
+              <input class="preset-name-input" v-else v-model="presetNames[index]" @blur="savePresetName(index)" @keyup.enter="savePresetName(index)"/>
+            </div>
         </div>
 
-        <div id="preset-0" v-if="isActive(0)" class="preset-content" @click="savePresetName(activeTabIndex)">
-          <div v-for="(container, index) in inputContainers[0]" :key="index" class="input-container">
-            <div class="mini-btn" @click="removeInputContainer(index)">
-              <i class="fas fa-minus"/>
+        <div v-for="presetIndex in [0, 1, 2]" :key="presetIndex" :id="'preset-' + presetIndex" v-show="isActive(presetIndex)" class="preset-content" @click="savePresetName(activeTabIndex)">
+          <div class="preset-content-scroll-zone">
+            <div v-for="(container, index) in inputContainers[presetIndex]" :key="index" class="input-container">
+              <div class="mini-btn" @click="removeInputContainer(index)">
+                <i class="fas fa-minus"/>
+              </div>
+              <div class="input-box">
+                <input class="form-control2 before-val" style="flex: 1;" v-model="container.before_val" @input="updateInputValue(index, 'before_val', container.before_val)" >
+                <i class="fas fa-arrow-right" style="margin: 0 10px;"/>
+                <input class="form-control2 after-val" style="flex: 1;" v-model="container.after_val" @input="updateInputValue(index, 'after_val', container.after_val)" >
+              </div>
             </div>
-            <div class="input-box">
-              <input class="form-control2 before-val" style="flex: 1;" v-model="container.before_val" @input="updateInputValue(index, 'before_val', container.before_val)" >
-              <i class="fas fa-arrow-right" style="margin: 0 10px;"/>
-              <input class="form-control2 after-val" style="flex: 1;" v-model="container.after_val" @input="updateInputValue(index, 'after_val', container.after_val)" >
-            </div>
-          </div>
-          <div class="plus-btn-container">
-            <div class="mini-btn row-plus-btn" @click="addInputContainer">
-              <i class="fas fa-plus"/>
-            </div>
-          </div>
-        </div>
-
-        <div id="preset-1" v-if="isActive(1)" class="preset-content" @click="savePresetName(activeTabIndex)">
-          <div v-for="(container, index) in inputContainers[1]" :key="index" class="input-container">
-            <div class="mini-btn" @click="removeInputContainer(index)">
-              <i class="fas fa-minus"/>
-            </div>
-            <div class="input-box">
-              <input class="form-control2 before-val" style="flex: 1;" v-model="container.before_val" @input="updateInputValue(index, 'before_val', container.before_val)" >
-              <i class="fas fa-arrow-right" style="margin: 0 10px;"/>
-              <input class="form-control2 after-val" style="flex: 1;" v-model="container.after_val" @input="updateInputValue(index, 'after_val', container.after_val)" >
+            <div class="plus-btn-container">
+              <div class="mini-btn row-plus-btn" @click="addInputContainer">
+                <i class="fas fa-plus"/>
+              </div>
             </div>
           </div>
-          <div class="plus-btn-container">
-            <div class="mini-btn row-plus-btn" @click="addInputContainer">
-              <i class="fas fa-plus"/>
-            </div>
-          </div>
-        </div>
-
-        <div id="preset-2" v-if="isActive(2)" class="preset-content" @click="savePresetName(activeTabIndex)">
-          <div v-for="(container, index) in inputContainers[2]" :key="index" class="input-container">
-            <div class="mini-btn" @click="removeInputContainer(index)">
-              <i class="fas fa-minus"/>
-            </div>
-            <div class="input-box">
-              <input class="form-control2 before-val" style="flex: 1;" v-model="container.before_val" @input="updateInputValue(index, 'before_val', container.before_val)" >
-              <i class="fas fa-arrow-right" style="margin: 0 10px;"/>
-              <input class="form-control2 after-val" style="flex: 1;" v-model="container.after_val" @input="updateInputValue(index, 'after_val', container.after_val)" >
-            </div>
-          </div>
-          <div class="plus-btn-container">
-            <div class="mini-btn row-plus-btn" @click="addInputContainer">
-              <i class="fas fa-plus"/>
-            </div>
+          <div class="export-and-import">
+            <button class="btn-setting" @click="exportPreset" style="margin-right: 10px;">내보내기</button>
+            <button class="btn-setting" @click="importPreset ">가져오기</button>
           </div>
         </div>
 
@@ -230,7 +239,7 @@ i {
 }
 
 .preset-container {
-  //flex: 1;
+  /* flex: 1; */
   resize: none;
   width: 100%;
   height: calc(100% - 140px);
@@ -251,8 +260,22 @@ i {
 .preset-content {
   background-color: #2b2d31;
   height: 100%;
+  padding: 20px 10px 10px 10px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.preset-content-scroll-zone {
+  height: calc(100% - 30px); /* export-and-import 높이를 제외한 나머지 높이 */
   overflow-y: auto;
-  padding: 25px 15px 15px 15px;
+  padding-right: 10px; /* 스크롤바와 내용 사이의 간격 */
+}
+
+.export-and-import {
+  display: flex;
+  padding-top: 25px;
+  justify-content: flex-end;
 }
 
 .input-container {

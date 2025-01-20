@@ -9,6 +9,8 @@ contextBridge.exposeInMainWorld('winAPI', {
 
 contextBridge.exposeInMainWorld('fileAPI', {
     openFolder: () => ipcRenderer.invoke('dialog:openFolder'),
+    savePresetFile: (defaultFileName) => ipcRenderer.invoke('dialog:savePresetFile', defaultFileName),
+    openPresetFile: () => ipcRenderer.invoke('dialog:openPresetFile'),
     findClassFile: (paths) =>  ipcRenderer.invoke('find-classFile', paths),
     makePatchFile: (copyPath, paths) =>  ipcRenderer.invoke('make-patchFile', copyPath, paths)
 });

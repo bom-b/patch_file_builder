@@ -111,47 +111,50 @@ async function updateFilePath(filePathList) {
 
   filePathList.sort();
   filePathList.forEach((path) => {
+    if (path) {
 
-    // 작업 프로젝트 경로와 파일 경로를 비교하기 위해 경로 구분자 통일
-    const replacedProjectPath = projectPath.value.replace(/\\/g, '/');
-    path = path.replace(/\\/g, '/');
+      // 작업 프로젝트 경로와 파일 경로를 비교하기 위해 경로 구분자 통일
+      const replacedProjectPath = projectPath.value.replace(/\\/g, '/');
+      path = path.replace(/\\/g, '/');
 
-    // 전체경로와 작업프로젝트 경로를 제외한 경로 구하기
-    let subPath;
-    let fullPath;
-    if (path.includes(replacedProjectPath)) {
-      subPath = path.replace(replacedProjectPath, '');
-      fullPath = path;
-    } else {
-      subPath = path;
-      fullPath = replacedProjectPath + path;
-    }
-
-    // 확장자 구하기
-    const extName = subPath.substring(subPath.lastIndexOf('.') + 1);
-
-    // 경로변경설정대로 변환된 경로 구하기
-    let convertPath = subPath;
-    usersPreset.forEach((preset) => {
-      convertPath = convertPath.replace(preset.before_val, preset.after_val);
-    })
-
-    // 필요시 설명 추가
-    let description = getDescription(path);
-
-    // 경로 하나에 대한 정보
-    const newElement = {use: true, path: subPath, convertPath: convertPath, fullPath: fullPath, desc: description};
-
-    if (filePaths.value[extName]) {
-      // 중복되지 않은 파일만 추가
-      const isExist = filePaths.value[extName].some((element) => {
-        return element.fullPath === newElement.fullPath;
-      });
-      if (!isExist) {
-        filePaths.value[extName].push(newElement);
+      // 전체경로와 작업프로젝트 경로를 제외한 경로 구하기
+      let subPath;
+      let fullPath;
+      if (path.includes(replacedProjectPath)) {
+        subPath = path.replace(replacedProjectPath, '');
+        fullPath = path;
+      } else {
+        subPath = path;
+        fullPath = replacedProjectPath + path;
       }
-    } else {
-      filePaths.value[extName] = [newElement];
+
+      // 확장자 구하기
+      const extName = subPath.substring(subPath.lastIndexOf('.') + 1);
+
+      // 경로변경설정대로 변환된 경로 구하기
+      let convertPath = subPath;
+      usersPreset.forEach((preset) => {
+        convertPath = convertPath.replace(preset.before_val, preset.after_val);
+      })
+
+      // 필요시 설명 추가
+      let description = getDescription(path);
+
+      // 경로 하나에 대한 정보
+      const newElement = {use: true, path: subPath, convertPath: convertPath, fullPath: fullPath, desc: description};
+
+      if (filePaths.value[extName]) {
+        // 중복되지 않은 파일만 추가
+        const isExist = filePaths.value[extName].some((element) => {
+          return element.fullPath === newElement.fullPath;
+        });
+        if (!isExist) {
+          filePaths.value[extName].push(newElement);
+        }
+      } else {
+        filePaths.value[extName] = [newElement];
+      }
+
     }
   });
   localStorage.setItem('filePaths', JSON.stringify(filePaths.value));
